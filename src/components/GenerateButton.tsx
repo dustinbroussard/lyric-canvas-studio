@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/lib/store';
 import { generatePromptFromLyrics } from '@/lib/openrouter';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function GenerateButton() {
@@ -63,19 +63,21 @@ export function GenerateButton() {
   };
 
   return (
-    <Button
+    <Button 
       onClick={handleGenerate}
       disabled={isGenerating || !lyrics.trim()}
-      className="w-full"
-      size="lg"
+      className="w-full h-12 text-base font-semibold bg-gradient-primary hover:opacity-90 shadow-lg hover:shadow-xl"
     >
       {isGenerating ? (
         <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
           Generating...
         </>
       ) : (
-        'Generate Prompt'
+        <>
+          <Sparkles className="mr-2 h-5 w-5" />
+          Generate Prompt
+        </>
       )}
     </Button>
   );

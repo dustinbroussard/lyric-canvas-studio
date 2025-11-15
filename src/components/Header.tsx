@@ -30,10 +30,12 @@ export function Header({ onOpenSettings, onOpenHistory }: HeaderProps) {
   };
 
   return (
-    <header className="border-b border-border bg-card">
+    <header className="sticky top-0 z-40 border-b border-border/40 bg-card/80 backdrop-blur-lg shadow-sm">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Lyric-to-Canvas</h1>
+          <h1 className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            Lyric-to-Canvas
+          </h1>
           <p className="text-sm text-muted-foreground">Cover art prompt studio</p>
         </div>
         
@@ -43,6 +45,7 @@ export function Header({ onOpenSettings, onOpenHistory }: HeaderProps) {
             size="icon"
             onClick={toggleTheme}
             aria-label="Toggle theme"
+            className="hover:scale-110 transition-transform"
           >
             {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
           </Button>
@@ -52,6 +55,7 @@ export function Header({ onOpenSettings, onOpenHistory }: HeaderProps) {
             size="icon"
             onClick={onOpenHistory}
             aria-label="View history"
+            className="hover:scale-110 transition-transform"
           >
             <History className="h-5 w-5" />
           </Button>
@@ -61,6 +65,7 @@ export function Header({ onOpenSettings, onOpenHistory }: HeaderProps) {
             size="icon"
             onClick={onOpenSettings}
             aria-label="Settings"
+            className="hover:scale-110 transition-transform"
           >
             <Settings className="h-5 w-5" />
           </Button>
