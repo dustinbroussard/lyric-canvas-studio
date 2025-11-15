@@ -6,6 +6,7 @@ import { PromptOutput } from '@/components/PromptOutput';
 import { GenerateButton } from '@/components/GenerateButton';
 import { SettingsDialog } from '@/components/SettingsDialog';
 import { HistoryDialog } from '@/components/HistoryDialog';
+import { InstallPrompt } from '@/components/InstallPrompt';
 import { useState } from 'react';
 
 const Index = () => {
@@ -13,13 +14,13 @@ const Index = () => {
   const [historyOpen, setHistoryOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-subtle">
       <Header 
         onOpenSettings={() => setSettingsOpen(true)}
         onOpenHistory={() => setHistoryOpen(true)}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 animate-fade-in">
         <div className="grid lg:grid-cols-2 gap-6">
           {/* Left Panel - Input */}
           <div className="space-y-6">
@@ -34,7 +35,7 @@ const Index = () => {
           </div>
 
           {/* Right Panel - Output */}
-          <div className="lg:sticky lg:top-8 h-fit">
+          <div className="lg:sticky lg:top-24 h-fit">
             <PromptOutput />
           </div>
         </div>
@@ -42,6 +43,7 @@ const Index = () => {
 
       <SettingsDialog open={settingsOpen} onOpenChange={setSettingsOpen} />
       <HistoryDialog open={historyOpen} onOpenChange={setHistoryOpen} />
+      <InstallPrompt />
     </div>
   );
 };

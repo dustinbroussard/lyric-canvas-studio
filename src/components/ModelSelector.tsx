@@ -1,5 +1,6 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
+import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useAppStore } from '@/lib/store';
@@ -13,9 +14,9 @@ export function ModelSelector() {
     : openRouterModels;
 
   return (
-    <div className="flex flex-col gap-3">
+    <Card className="p-4 space-y-3 shadow-lg hover:shadow-xl transition-shadow">
       <div className="flex items-center justify-between">
-        <Label>AI Model</Label>
+        <Label className="text-base font-semibold">AI Model</Label>
         <div className="flex items-center gap-2">
           <Switch
             id="free-only"
@@ -29,10 +30,10 @@ export function ModelSelector() {
       </div>
 
       <Select value={selectedModelId} onValueChange={setSelectedModelId}>
-        <SelectTrigger>
+        <SelectTrigger className="shadow-sm">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="max-h-[300px]">
           {filteredModels.map((model) => (
             <SelectItem key={model.id} value={model.id}>
               <div className="flex items-center gap-2">
@@ -50,6 +51,6 @@ export function ModelSelector() {
           ))}
         </SelectContent>
       </Select>
-    </div>
+    </Card>
   );
 }
