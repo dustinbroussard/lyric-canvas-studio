@@ -2,19 +2,26 @@ import { useState, useEffect } from 'react';
 import { Download, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { toast } from 'sonner';
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+};
 
 export function InstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
     // Check if already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone || (window.navigator as any).standalone) {
+    const navigatorWithStandalone = window.navigator as Navigator & { standalone?: boolean };
+    if (isStandalone || navigatorWithStandalone.standalone) {
       return;
     }
 
-    const handler = (e: Event) => {
+    const handler = (e: BeforeInstallPromptEvent) => {
       e.preventDefault();
       setDeferredPrompt(e);
       
@@ -35,14 +42,19 @@ export function InstallPrompt() {
   const handleInstall = async () => {
     if (!deferredPrompt) return;
 
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setShowPrompt(false);
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        setShowPrompt(false);
+      }
+    } catch (error) {
+      console.error('PWA install prompt failed', error);
+      toast.error('Failed to open install prompt. Please try again.');
+    } finally {
+      setDeferredPrompt(null);
     }
-    
-    setDeferredPrompt(null);
   };
 
   const handleDismiss = () => {

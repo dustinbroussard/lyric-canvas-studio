@@ -119,29 +119,51 @@ Focus on visual, cinematic, and atmospheric elements that capture the essence of
     throw new Error('No response from OpenRouter');
   }
 
-  const analysis: PromptAnalysis = JSON.parse(content);
+  let analysis: PromptAnalysis;
+
+  try {
+    analysis = JSON.parse(content) as PromptAnalysis;
+  } catch (error) {
+    console.error('Failed to parse OpenRouter response', error);
+    throw new Error('OpenRouter returned an unexpected response. Please try again.');
+  }
+
+  if (!analysis.visualConcept) {
+    throw new Error('OpenRouter response was missing visual concept details.');
+  }
 
   // Build the final prompt
   const promptParts: string[] = [];
+  const { subject, environment, composition, lighting } = analysis.visualConcept;
+  const vibeKeywords = analysis.vibeKeywords ?? [];
+  const colorPalette = analysis.colorPalette ?? [];
+  const primarySymbols = analysis.primarySymbols ?? [];
+
+  const pushIfValue = (value?: string) => {
+    if (value) {
+      promptParts.push(value);
+    }
+  };
 
   // Add the visual concept
-  promptParts.push(analysis.visualConcept.subject);
-  promptParts.push(analysis.visualConcept.environment);
-  promptParts.push(analysis.visualConcept.composition);
-  promptParts.push(analysis.visualConcept.lighting);
+  [subject, environment, composition, lighting].forEach((value) => pushIfValue(value));
 
   // Add mood and vibe
-  promptParts.push(`mood: ${analysis.mood}`);
-  promptParts.push(analysis.vibeKeywords.join(', '));
+  if (analysis.mood) {
+    promptParts.push(`mood: ${analysis.mood}`);
+  }
+  if (vibeKeywords.length > 0) {
+    promptParts.push(vibeKeywords.join(', '));
+  }
 
   // Add color palette
-  if (analysis.colorPalette.length > 0) {
-    promptParts.push(`color palette: ${analysis.colorPalette.join(', ')}`);
+  if (colorPalette.length > 0) {
+    promptParts.push(`color palette: ${colorPalette.join(', ')}`);
   }
 
   // Add symbols
-  if (analysis.primarySymbols.length > 0) {
-    promptParts.push(`featuring: ${analysis.primarySymbols.join(', ')}`);
+  if (primarySymbols.length > 0) {
+    promptParts.push(`featuring: ${primarySymbols.join(', ')}`);
   }
 
   // Add preset style if provided

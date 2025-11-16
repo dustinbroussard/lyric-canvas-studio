@@ -14,15 +14,25 @@ export function Header({ onOpenSettings, onOpenHistory }: HeaderProps) {
 
   useEffect(() => {
     const root = window.document.documentElement;
-    
+    const applyTheme = (mode: 'light' | 'dark') => {
+      setIsDark(mode === 'dark');
+      root.classList.toggle('dark', mode === 'dark');
+    };
+
     if (theme === 'system') {
-      const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      setIsDark(systemTheme === 'dark');
-      root.classList.toggle('dark', systemTheme === 'dark');
-    } else {
-      setIsDark(theme === 'dark');
-      root.classList.toggle('dark', theme === 'dark');
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = (event: MediaQueryListEvent) => {
+        applyTheme(event.matches ? 'dark' : 'light');
+      };
+
+      applyTheme(mediaQuery.matches ? 'dark' : 'light');
+      mediaQuery.addEventListener('change', handleChange);
+
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
+
+    applyTheme(theme);
+    return undefined;
   }, [theme]);
 
   const toggleTheme = () => {

@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { useAppStore } from '@/lib/store';
+import { useAppStore, type HistoryEntry } from '@/lib/store';
 import { Copy, Trash2, Download } from 'lucide-react';
 import { toast } from 'sonner';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -21,11 +21,16 @@ export function HistoryDialog({ open, onOpenChange }: HistoryDialogProps) {
   const { history, deleteHistoryEntry, loadHistoryEntry, clearHistory } = useAppStore();
 
   const handleCopy = async (text: string) => {
-    await navigator.clipboard.writeText(text);
-    toast.success('Copied to clipboard');
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success('Copied to clipboard');
+    } catch (error) {
+      console.error('Failed to copy history entry', error);
+      toast.error('Copy failed. Please try again.');
+    }
   };
 
-  const handleLoad = (entry: typeof history[0]) => {
+  const handleLoad = (entry: HistoryEntry) => {
     loadHistoryEntry(entry);
     onOpenChange(false);
     toast.success('Loaded into editor');
@@ -70,59 +75,64 @@ export function HistoryDialog({ open, onOpenChange }: HistoryDialogProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              {history.map((entry) => (
-                <Card key={entry.id} className="p-4">
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(entry.timestamp).toLocaleString()}
-                        </p>
-                        <p className="text-sm font-medium">
-                          {entry.modelId.split('/')[1]} • {entry.presetId}
-                        </p>
-                      </div>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleCopy(entry.fullPrompt)}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleLoad(entry)}
-                        >
-                          <Download className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(entry.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    <div className="text-xs">
-                      <p className="text-muted-foreground mb-1">Lyrics preview:</p>
-                      <p className="line-clamp-2 font-mono bg-muted p-2 rounded">
-                        {entry.lyrics}
-                      </p>
-                    </div>
+              {history.map((entry) => {
+                const modelName = entry.modelId.includes('/') ? entry.modelId.split('/')[1] : entry.modelId;
+                const presetLabel = entry.presetId || 'Custom preset';
 
-                    <div className="text-xs">
-                      <p className="text-muted-foreground mb-1">Generated prompt:</p>
-                      <p className="line-clamp-3 font-mono bg-muted p-2 rounded">
-                        {entry.fullPrompt}
-                      </p>
+                return (
+                  <Card key={entry.id} className="p-4">
+                    <div className="space-y-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(entry.timestamp).toLocaleString()}
+                          </p>
+                          <p className="text-sm font-medium">
+                            {modelName} • {presetLabel}
+                          </p>
+                        </div>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleCopy(entry.fullPrompt)}
+                          >
+                            <Copy className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleLoad(entry)}
+                          >
+                            <Download className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(entry.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="text-xs">
+                        <p className="text-muted-foreground mb-1">Lyrics preview:</p>
+                        <p className="line-clamp-2 font-mono bg-muted p-2 rounded">
+                          {entry.lyrics}
+                        </p>
+                      </div>
+
+                      <div className="text-xs">
+                        <p className="text-muted-foreground mb-1">Generated prompt:</p>
+                        <p className="line-clamp-3 font-mono bg-muted p-2 rounded">
+                          {entry.fullPrompt}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                );
+              })}
             </div>
           )}
         </ScrollArea>

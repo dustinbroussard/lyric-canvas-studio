@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useAppStore } from '@/lib/store';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -22,6 +22,12 @@ export function SettingsDialog({ open, onOpenChange }: SettingsDialogProps) {
   const { apiKey, setApiKey } = useAppStore();
   const [localKey, setLocalKey] = useState(apiKey);
   const [showKey, setShowKey] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setLocalKey(apiKey);
+    }
+  }, [apiKey, open]);
 
   const handleSave = () => {
     setApiKey(localKey);
